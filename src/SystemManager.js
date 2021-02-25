@@ -74,9 +74,13 @@ export class SystemManager {
   executeSystem(system, delta, time) {
     if (system.initialized) {
       if (system.canExecute()) {
-        let startTime = now();
-        system.execute(delta, time);
-        system.executeTime = now() - startTime;
+        if (process.env.NODE_ENV !== "production") {
+          let startTime = now();
+          system.execute(delta, time);
+          system.executeTime = now() - startTime;
+        } else {
+          system.execute(delta, time);
+        }
         this.lastExecutedSystem = system;
         system.clearEvents();
       }
