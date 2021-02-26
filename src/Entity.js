@@ -72,9 +72,8 @@ export class Entity {
 
     for (var i = 0; i < this.queries.length; i++) {
       var query = this.queries[i];
-      // @todo accelerate this check. Maybe having query._Components as an object
       // @todo add Not components
-      if (query.reactive && query.Components.indexOf(Component) !== -1) {
+      if (query.reactive && query.Components & Component._typeBit) {
         query.eventDispatcher.dispatchEvent(
           Query.prototype.COMPONENT_CHANGED,
           this,
