@@ -6,18 +6,20 @@ export default class Query {
    * @param {Array(Component)} Components List of types of components to query
    */
   constructor(Components, manager) {
-    this.Components = 0;
-    this.NotComponents = 0;
+    this.ComponentsMask = 0;
+    this.NotComponentsMask = 0;
+    this.highestBit = 0;
 
     Components.forEach((component) => {
       if (typeof component === "object") {
-        this.NotComponents |= component.Component._typeBit;
+        this.NotComponentsMask |= component.Component._typeBit;
       } else {
-        this.Components |= component._typeBit;
+        this.ComponentsMask |= component._typeBit;
       }
+      this.highestBit = Math.max(this.highestBit, component._typeId);
     });
 
-    if (this.Components === 0) {
+    if (this.ComponentsMask === 0) {
       throw new Error("Can't create a query without components");
     }
 
@@ -73,8 +75,8 @@ export default class Query {
 
   match(entity) {
     return (
-      entity.hasAllComponents(this.Components) &&
-      !entity.hasAnyComponents(this.NotComponents)
+      (entity._ComponentBits & this.ComponentsMask) === this.ComponentsMask &&
+      !(entity._ComponentBits & this.NotComponentsMask)
     );
   }
 
@@ -83,8 +85,8 @@ export default class Query {
       key: this.key,
       reactive: this.reactive,
       components: {
-        included: this.Components.map((C) => C.name),
-        not: this.NotComponents.map((C) => C.name),
+        included: this.ComponentsMask.map((C) => C.name),
+        not: this.NotComponentsMask.map((C) => C.name),
       },
       numEntities: this.entities.length,
     };
@@ -94,8 +96,18 @@ export default class Query {
    * Return stats for this query
    */
   stats() {
+    let mask = this.ComponentsMask;
+    let num = 0;
+    for (let i = 0; i <= this.highestBit; i++) {
+      if (mask & 1) num++;
+      mask = mask >> 1;
+      if (mask === 0) {
+        break;
+      }
+    }
+
     return {
-      numComponents: this.Components,
+      numComponents: num,
       numEntities: this.entities.length,
     };
   }

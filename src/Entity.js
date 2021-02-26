@@ -74,8 +74,8 @@ export class Entity {
       var query = this.queries[i];
       if (
         query.reactive &&
-        query.Components & Component._typeBit &&
-        !(query.NotComponents & Component._typeBit)
+        query.ComponentsMask & Component._typeBit &&
+        !(query.NotComponentsMask & Component._typeBit)
       ) {
         query.eventDispatcher.dispatchEvent(
           Query.prototype.COMPONENT_CHANGED,
@@ -99,7 +99,7 @@ export class Entity {
 
   hasComponent(Component, includeRemoved) {
     return (
-      !!~this._ComponentTypes.indexOf(Component) ||
+      !!(this._ComponentBits & Component._typeBit) ||
       (includeRemoved === true && this.hasRemovedComponent(Component))
     );
   }
@@ -109,11 +109,21 @@ export class Entity {
   }
 
   hasAllComponents(Components) {
-    return (this._ComponentBits & Components) === Components;
+    let mask = 0;
+    Components.forEach((c) => {
+      mask |= c._typeBit;
+    });
+
+    return (this._ComponentBits & mask) === mask;
   }
 
   hasAnyComponents(Components) {
-    return (this._ComponentBits & Components) > 0;
+    let mask = 0;
+    Components.forEach((c) => {
+      mask |= c._typeBit;
+    });
+
+    return !!(this._ComponentBits & mask);
   }
 
   removeAllComponents(forceImmediate) {

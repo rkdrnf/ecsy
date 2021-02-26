@@ -152,6 +152,7 @@ export class EntityManager {
         this.entitiesWithComponentsToRemove.push(entity);
 
       entity._ComponentTypes.splice(index, 1);
+      entity._ComponentBits &= ~Component._typeBit;
       entity._ComponentTypesToRemove.push(Component);
 
       entity._componentsToRemove[Component._typeId] =
@@ -175,6 +176,7 @@ export class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
+    entity._ComponentBits &= ~Component._typeBit;
     var component = entity._components[Component._typeId];
     delete entity._components[Component._typeId];
     component.dispose();
