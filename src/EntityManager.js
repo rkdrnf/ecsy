@@ -95,7 +95,7 @@ export class EntityManager {
       );
     }
 
-    if (~entity._ComponentTypes.indexOf(Component)) {
+    if (entity._ComponentBits & Component._typeBit) {
       if (process.env.NODE_ENV !== "production") {
         console.warn(
           "Component type already exists on entity.",
@@ -107,6 +107,7 @@ export class EntityManager {
     }
 
     entity._ComponentTypes.push(Component);
+    entity._ComponentBits |= Component._typeBit;
 
     if (Component.__proto__ === SystemStateComponent) {
       entity.numStateComponents++;

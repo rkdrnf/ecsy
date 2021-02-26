@@ -41,6 +41,7 @@ export class ComponentManager {
     }
 
     Component._typeId = this.nextComponentId++;
+    Component._typeBit = 1 << Component._typeId;
     this.Components.push(Component);
     this._ComponentsMap[Component._typeId] = Component;
     this.numComponents[Component._typeId] = 0;

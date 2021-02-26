@@ -10,6 +10,7 @@ export class Entity {
 
     // List of components types the entity has
     this._ComponentTypes = [];
+    this._ComponentBits = 0;
 
     // Instance of the components
     this._components = {};
@@ -106,17 +107,11 @@ export class Entity {
   }
 
   hasAllComponents(Components) {
-    for (var i = 0; i < Components.length; i++) {
-      if (!this.hasComponent(Components[i])) return false;
-    }
-    return true;
+    return (this._ComponentBits & Components) === Components;
   }
 
   hasAnyComponents(Components) {
-    for (var i = 0; i < Components.length; i++) {
-      if (this.hasComponent(Components[i])) return true;
-    }
-    return false;
+    return (this._ComponentBits & Components) > 0;
   }
 
   removeAllComponents(forceImmediate) {
@@ -142,6 +137,7 @@ export class Entity {
   reset() {
     this.id = this._entityManager._nextEntityId++;
     this._ComponentTypes.length = 0;
+    this._ComponentBits = 0;
     this.queries.length = 0;
 
     for (var ecsyComponentId in this._components) {

@@ -11,6 +11,8 @@ export default class QueryManager {
 
     // Queries indexed by a unique identifier for the components it has
     this._queries = {};
+
+    this._componentQueryMap = {};
   }
 
   onEntityRemoved(entity) {
@@ -28,14 +30,13 @@ export default class QueryManager {
    * @param {Component} Component Component added to the entity
    */
   onEntityComponentAdded(entity, Component) {
-    // @todo Use bitmask for checking components?
-
+    // @todo Reduce search range by storing queries by componentType
     // Check each indexed query to see if we need to add this entity to the list
     for (var queryName in this._queries) {
       var query = this._queries[queryName];
 
       if (
-        !!~query.NotComponents.indexOf(Component) &&
+        query.NotComponents & Component._typeBit &&
         ~query.entities.indexOf(entity)
       ) {
         query.removeEntity(entity);
@@ -47,7 +48,7 @@ export default class QueryManager {
       // and Entity has ALL the components of the query
       // and Entity is not already in the query
       if (
-        !~query.Components.indexOf(Component) ||
+        !(query.Components & Component._typeBit) ||
         !query.match(entity) ||
         ~query.entities.indexOf(entity)
       )
@@ -67,7 +68,7 @@ export default class QueryManager {
       var query = this._queries[queryName];
 
       if (
-        !!~query.NotComponents.indexOf(Component) &&
+        query.NotComponents & Component._typeBit &&
         !~query.entities.indexOf(entity) &&
         query.match(entity)
       ) {
@@ -76,7 +77,7 @@ export default class QueryManager {
       }
 
       if (
-        !!~query.Components.indexOf(Component) &&
+        query.Components & Component._typeBit &&
         !!~query.entities.indexOf(entity) &&
         !query.match(entity)
       ) {

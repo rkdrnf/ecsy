@@ -6,18 +6,18 @@ export default class Query {
    * @param {Array(Component)} Components List of types of components to query
    */
   constructor(Components, manager) {
-    this.Components = [];
-    this.NotComponents = [];
+    this.Components = 0;
+    this.NotComponents = 0;
 
     Components.forEach((component) => {
       if (typeof component === "object") {
-        this.NotComponents.push(component.Component);
+        this.NotComponents |= component.Component._typeBit;
       } else {
-        this.Components.push(component);
+        this.Components |= component._typeBit;
       }
     });
 
-    if (this.Components.length === 0) {
+    if (this.Components === 0) {
       throw new Error("Can't create a query without components");
     }
 
@@ -95,7 +95,7 @@ export default class Query {
    */
   stats() {
     return {
-      numComponents: this.Components.length,
+      numComponents: this.Components,
       numEntities: this.entities.length,
     };
   }
