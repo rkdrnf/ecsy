@@ -10,7 +10,7 @@ export class Entity {
 
     // List of components types the entity has
     this._ComponentTypes = [];
-    this._ComponentBits = 0;
+    this._ComponentBits = 0n;
 
     // Instance of the components
     this._components = {};
@@ -109,7 +109,7 @@ export class Entity {
   }
 
   hasAllComponents(Components) {
-    let mask = 0;
+    let mask = 0n;
     Components.forEach((c) => {
       mask |= c._typeBit;
     });
@@ -118,7 +118,7 @@ export class Entity {
   }
 
   hasAnyComponents(Components) {
-    let mask = 0;
+    let mask = 0n;
     Components.forEach((c) => {
       mask |= c._typeBit;
     });
@@ -149,7 +149,7 @@ export class Entity {
   reset() {
     this.id = this._entityManager._nextEntityId++;
     this._ComponentTypes.length = 0;
-    this._ComponentBits = 0;
+    this._ComponentBits = 0n;
     this.queries.length = 0;
 
     for (var ecsyComponentId in this._components) {
