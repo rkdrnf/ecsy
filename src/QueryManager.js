@@ -30,11 +30,9 @@ export default class QueryManager {
    * @param {Component} Component Component added to the entity
    */
   onEntityComponentAdded(entity, Component) {
-    // @todo Reduce search range by storing queries by componentType
+    if (!this._componentQueryMap[Component._typeId]) return;
     // Check each indexed query to see if we need to add this entity to the list
-    for (var queryName in this._queries) {
-      var query = this._queries[queryName];
-
+    for (const query of this._componentQueryMap[Component._typeId]) {
       if (
         query.NotComponentsMask[Component._typeId] &&
         ~query.entities.indexOf(entity)
@@ -48,7 +46,7 @@ export default class QueryManager {
       // and Entity has ALL the components of the query
       // and Entity is not already in the query
       if (
-        !(query.ComponentsMask[Component._typeId]) ||
+        !query.ComponentsMask[Component._typeId] ||
         !query.match(entity) ||
         ~query.entities.indexOf(entity)
       )
@@ -64,9 +62,9 @@ export default class QueryManager {
    * @param {Component} Component Component to remove from the entity
    */
   onEntityComponentRemoved(entity, Component) {
-    for (var queryName in this._queries) {
-      var query = this._queries[queryName];
+    if (!this._componentQueryMap[Component._typeId]) return;
 
+    for (const query of this._componentQueryMap[Component._typeId]) {
       if (
         query.NotComponentsMask[Component._typeId] &&
         !~query.entities.indexOf(entity) &&
@@ -96,6 +94,15 @@ export default class QueryManager {
     var query = this._queries[key];
     if (!query) {
       this._queries[key] = query = new Query(Components, this._world);
+
+      Components.forEach((c) => {
+        let component = typeof c === "object" ? c.Component : c;
+
+        if (!this._componentQueryMap[component._typeId]) {
+          this._componentQueryMap[component._typeId] = [];
+        }
+        this._componentQueryMap[component._typeId].push(query);
+      });
     }
     return query;
   }
