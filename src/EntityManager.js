@@ -95,7 +95,7 @@ export class EntityManager {
       );
     }
 
-    if (entity._ComponentBits & Component._typeBit) {
+    if (entity._ComponentBits[Component._typeId]) {
       if (process.env.NODE_ENV !== "production") {
         console.warn(
           "Component type already exists on entity.",
@@ -107,7 +107,7 @@ export class EntityManager {
     }
 
     entity._ComponentTypes.push(Component);
-    entity._ComponentBits |= Component._typeBit;
+    entity._ComponentBits[Component._typeId] = true;
 
     if (Component.__proto__ === SystemStateComponent) {
       entity.numStateComponents++;
@@ -152,7 +152,7 @@ export class EntityManager {
         this.entitiesWithComponentsToRemove.push(entity);
 
       entity._ComponentTypes.splice(index, 1);
-      entity._ComponentBits &= ~Component._typeBit;
+      delete entity._ComponentBits[Component._typeId];
       entity._ComponentTypesToRemove.push(Component);
 
       entity._componentsToRemove[Component._typeId] =
@@ -176,7 +176,7 @@ export class EntityManager {
   _entityRemoveComponentSync(entity, Component, index) {
     // Remove T listing on entity and property ref, then free the component.
     entity._ComponentTypes.splice(index, 1);
-    entity._ComponentBits &= ~Component._typeBit;
+    delete entity._ComponentBits[Component._typeId];
     var component = entity._components[Component._typeId];
     delete entity._components[Component._typeId];
     component.dispose();

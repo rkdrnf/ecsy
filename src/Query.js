@@ -6,20 +6,22 @@ export default class Query {
    * @param {Array(Component)} Components List of types of components to query
    */
   constructor(Components, manager) {
-    this.ComponentsMask = 0n;
-    this.NotComponentsMask = 0n;
-    this.highestBit = 0;
+    this.ComponentsMask = {};
+    this.NotComponentsMask = {};
+    this.Components = [];
+    this.NotComponents = [];
 
     Components.forEach((component) => {
       if (typeof component === "object") {
-        this.NotComponentsMask |= component.Component._typeBit;
+        this.NotComponentsMask[component.Component._typeId] = true;
+        this.NotComponents.push(component.Component);
       } else {
-        this.ComponentsMask |= component._typeBit;
+        this.ComponentsMask[component._typeId] = true;
+        this.Components.push(component);
       }
-      this.highestBit = Math.max(this.highestBit, component._typeId);
     });
 
-    if (this.ComponentsMask === 0n) {
+    if (this.Components.length === 0) {
       throw new Error("Can't create a query without components");
     }
 
@@ -75,8 +77,8 @@ export default class Query {
 
   match(entity) {
     return (
-      (entity._ComponentBits & this.ComponentsMask) === this.ComponentsMask &&
-      !(entity._ComponentBits & this.NotComponentsMask)
+      this.Components.every((c) => entity._ComponentBits[c._typeId]) &&
+      !this.NotComponents.some((c) => entity._ComponentBits[c._typeId])
     );
   }
 
@@ -85,8 +87,8 @@ export default class Query {
       key: this.key,
       reactive: this.reactive,
       components: {
-        included: this.ComponentsMask.map((C) => C.name),
-        not: this.NotComponentsMask.map((C) => C.name),
+        included: this.Components.map((C) => C.name),
+        not: this.NotComponents.map((C) => C.name),
       },
       numEntities: this.entities.length,
     };
@@ -96,18 +98,8 @@ export default class Query {
    * Return stats for this query
    */
   stats() {
-    let mask = this.ComponentsMask;
-    let num = 0;
-    for (let i = 0; i <= this.highestBit; i++) {
-      if (mask & 1n) num++;
-      mask = mask >> 1n;
-      if (mask === 0) {
-        break;
-      }
-    }
-
     return {
-      numComponents: num,
+      numComponents: this.Components.length,
       numEntities: this.entities.length,
     };
   }

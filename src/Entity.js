@@ -10,7 +10,7 @@ export class Entity {
 
     // List of components types the entity has
     this._ComponentTypes = [];
-    this._ComponentBits = 0n;
+    this._ComponentBits = {};
 
     // Instance of the components
     this._components = {};
@@ -74,8 +74,8 @@ export class Entity {
       var query = this.queries[i];
       if (
         query.reactive &&
-        query.ComponentsMask & Component._typeBit &&
-        !(query.NotComponentsMask & Component._typeBit)
+        query.ComponentsMask[Component._typeId] &&
+        !query.NotComponentsMask[Component._typeId]
       ) {
         query.eventDispatcher.dispatchEvent(
           Query.prototype.COMPONENT_CHANGED,
@@ -99,7 +99,7 @@ export class Entity {
 
   hasComponent(Component, includeRemoved) {
     return (
-      !!(this._ComponentBits & Component._typeBit) ||
+      !!(this._ComponentBits[Component._typeId]) ||
       (includeRemoved === true && this.hasRemovedComponent(Component))
     );
   }
@@ -109,21 +109,11 @@ export class Entity {
   }
 
   hasAllComponents(Components) {
-    let mask = 0n;
-    Components.forEach((c) => {
-      mask |= c._typeBit;
-    });
-
-    return (this._ComponentBits & mask) === mask;
+    return Components.every(c => this._ComponentBits[c._typeId]);
   }
 
   hasAnyComponents(Components) {
-    let mask = 0n;
-    Components.forEach((c) => {
-      mask |= c._typeBit;
-    });
-
-    return !!(this._ComponentBits & mask);
+    return Components.some(c => this._ComponentBits[c._typeId]);
   }
 
   removeAllComponents(forceImmediate) {
