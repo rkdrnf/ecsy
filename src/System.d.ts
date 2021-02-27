@@ -89,7 +89,7 @@ export interface SystemConstructor<T extends System> {
 
 export interface NotComponent<C extends Component<any>> {
   type: "not",
-  Component: ComponentConstructor<C>
+  Component: ComponentConstructor<C>,
 }
 
 /**

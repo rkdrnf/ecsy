@@ -117,8 +117,10 @@ export class Entity {
    * @param values Optional values to replace the default attributes on the component
    */
   addArchetype<A extends Archetype>(
-    Archetype: ArchetypeConstructor,
-    values?: { [key in A]: Partial<A[key]> }
+    Archetype: ArchetypeConstructor<A>,
+    values?: Partial<
+      { [key in keyof A]: Partial<Omit<A[key], keyof Component<any>>> }
+    >
   ): this;
 
   copy(source: this): this;

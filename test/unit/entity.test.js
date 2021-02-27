@@ -343,8 +343,23 @@ test("Adding archetype", async (t) => {
     entity.removeComponent(FooComponent);
   });
 
-  t.is(
-    error.message,
-    "Component in archetype can\'t be removed independantly"
-  );
+  t.is(error.message, "Component in archetype can't be removed independantly");
+});
+
+test("Adding archetype default value", async (t) => {
+  const world = new World();
+
+  world.registerComponent(FooComponent);
+
+  class ArchetypeA extends Archetype {}
+  ArchetypeA.schema = {
+    foo: FooComponent,
+  };
+
+  world.registerArchetype(ArchetypeA);
+
+  const entity = world.createEntity().addArchetype(ArchetypeA, {});
+
+  t.true(entity.hasComponent(FooComponent));
+  t.is(entity.getComponent(FooComponent).variableFoo, 0);
 });
