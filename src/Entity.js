@@ -139,7 +139,7 @@ export class Entity {
   reset() {
     this.id = this._entityManager._nextEntityId++;
     this._ComponentTypes.length = 0;
-    this._ComponentBits = 0n;
+    this._ComponentBits = {};
     this.queries.length = 0;
 
     for (var ecsyComponentId in this._components) {
