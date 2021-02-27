@@ -8,7 +8,7 @@ export class Entity {
     // Unique ID for this entity
     this.id = entityManager._nextEntityId++;
 
-    this._Archetype = undefined;
+    this._Archetype = null;
     // Instance of the components
     this._components = {};
 
@@ -146,6 +146,7 @@ export class Entity {
   }
 
   reset() {
+    this._Archetype = null;
     this.id = this._entityManager._nextEntityId++;
     this.queries.length = 0;
 
