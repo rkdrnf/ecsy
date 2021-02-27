@@ -151,10 +151,13 @@ export class System {
 
                 query.eventDispatcher.addEventListener(
                   eventMapping[eventName],
-                  (entity) => {
-                    // @fixme overhead?
-                    if (eventList.indexOf(entity) === -1)
+                  (entity, component, data) => {
+                    if (data && data.nocheck) {
                       eventList.push(entity);
+                    } else {
+                      if (eventList.indexOf(entity) === -1)
+                        eventList.push(entity);
+                    }
                   }
                 );
               }

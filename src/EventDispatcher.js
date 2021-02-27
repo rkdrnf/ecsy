@@ -60,7 +60,7 @@ export default class EventDispatcher {
    * @param {Entity} entity (Optional) Entity to emit
    * @param {Component} component
    */
-  dispatchEvent(eventName, entity, component) {
+  dispatchEvent(eventName, entity, component, data) {
     this.stats.fired++;
 
     var listenerArray = this._listeners[eventName];
@@ -68,7 +68,7 @@ export default class EventDispatcher {
       var array = listenerArray.slice(0);
 
       for (var i = 0; i < array.length; i++) {
-        array[i].call(this, entity, component);
+        array[i].call(this, entity, component, data);
       }
     }
   }

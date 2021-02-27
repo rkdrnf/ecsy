@@ -50,24 +50,27 @@ export default class Query {
    * Add entity to this query
    * @param {Entity} entity
    */
-  addEntity(entity) {
+  addEntity(entity, nocheck = false) {
     this.entities.push(entity);
 
-    this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity);
+    this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity, {
+      nocheck,
+    });
   }
 
   /**
    * Remove entity from this query
    * @param {Entity} entity
    */
-  removeEntity(entity) {
+  removeEntity(entity, nocheck = false) {
     let index = this.entities.indexOf(entity);
     if (~index) {
       this.entities.splice(index, 1);
 
       this.eventDispatcher.dispatchEvent(
         Query.prototype.ENTITY_REMOVED,
-        entity
+        entity,
+        { nocheck }
       );
     }
   }

@@ -18,16 +18,16 @@ export default class QueryManager {
 
   onEntityRemoved(entity) {
     for (const query of entity.queries) {
-      query.removeEntity(entity);
+      query.removeEntity(entity, true);
     }
     entity.queries = [];
   }
 
   onEntityArchetypeAdded(entity, Archetype) {
     if (!this._archetypeQueryMap[Archetype._typeId]) return;
-    // Check each indexed query to see if we need to add this entity to the list
+
     for (const query of this._archetypeQueryMap[Archetype._typeId]) {
-      query.addEntity(entity);
+      query.addEntity(entity, true);
       entity.queries.push(query);
     }
   }
@@ -107,7 +107,10 @@ export default class QueryManager {
     var key = queryKey(Components);
     var query = this._queries[key];
     if (!query) {
-      this._queries[key] = query = new Query(Components, this._world.entityManager);
+      this._queries[key] = query = new Query(
+        Components,
+        this._world.entityManager
+      );
 
       const Archetypes = this._world.archetypesManager.Archetypes.filter((a) =>
         query.matchArchetype(a)
