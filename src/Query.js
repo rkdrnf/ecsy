@@ -53,9 +53,14 @@ export default class Query {
   addEntity(entity, nocheck = false) {
     this.entities.push(entity);
 
-    this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity, {
-      nocheck,
-    });
+    this.eventDispatcher.dispatchEvent(
+      Query.prototype.ENTITY_ADDED,
+      entity,
+      null,
+      {
+        nocheck,
+      }
+    );
   }
 
   /**
@@ -70,6 +75,7 @@ export default class Query {
       this.eventDispatcher.dispatchEvent(
         Query.prototype.ENTITY_REMOVED,
         entity,
+        null,
         { nocheck }
       );
     }
