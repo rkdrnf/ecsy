@@ -77,8 +77,8 @@ export default class Query {
 
   match(entity) {
     return (
-      this.Components.every((c) => entity._ComponentBits[c._typeId]) &&
-      !this.NotComponents.some((c) => entity._ComponentBits[c._typeId])
+      this.Components.every((c) => entity._components[c._typeId]) &&
+      !this.NotComponents.some((c) => entity._components[c._typeId])
     );
   }
 

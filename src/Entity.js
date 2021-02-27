@@ -10,7 +10,6 @@ export class Entity {
 
     // List of components types the entity has
     this._ComponentTypes = [];
-    this._ComponentBits = {};
 
     // Instance of the components
     this._components = {};
@@ -99,7 +98,7 @@ export class Entity {
 
   hasComponent(Component, includeRemoved) {
     return (
-      !!(this._ComponentBits[Component._typeId]) ||
+      !!(this._components[Component._typeId]) ||
       (includeRemoved === true && this.hasRemovedComponent(Component))
     );
   }
@@ -109,11 +108,11 @@ export class Entity {
   }
 
   hasAllComponents(Components) {
-    return Components.every(c => this._ComponentBits[c._typeId]);
+    return Components.every(c => this._components[c._typeId]);
   }
 
   hasAnyComponents(Components) {
-    return Components.some(c => this._ComponentBits[c._typeId]);
+    return Components.some(c => this._components[c._typeId]);
   }
 
   removeAllComponents(forceImmediate) {
@@ -139,7 +138,6 @@ export class Entity {
   reset() {
     this.id = this._entityManager._nextEntityId++;
     this._ComponentTypes.length = 0;
-    this._ComponentBits = {};
     this.queries.length = 0;
 
     for (var ecsyComponentId in this._components) {
