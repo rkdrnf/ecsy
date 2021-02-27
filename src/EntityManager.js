@@ -87,7 +87,7 @@ export class EntityManager {
       );
     }
 
-    if (entity.Archetype) {
+    if (entity._Archetype) {
       if (process.env.NODE_ENV !== "production") {
         console.warn(
           "Entity already has a archetype. Only 1 archetype can be added per entity.",
