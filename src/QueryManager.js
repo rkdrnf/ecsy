@@ -13,14 +13,22 @@ export default class QueryManager {
     this._queries = {};
 
     this._componentQueryMap = {};
+    this._archetypeQueryMap = {};
   }
 
   onEntityRemoved(entity) {
-    for (var queryName in this._queries) {
-      var query = this._queries[queryName];
-      if (entity.queries.indexOf(query) !== -1) {
-        query.removeEntity(entity);
-      }
+    for (const query of entity.queries) {
+      query.removeEntity(entity);
+    }
+    entity.queries = [];
+  }
+
+  onEntityArchetypeAdded(entity, Archetype) {
+    if (!this._archetypeQueryMap[Archetype._typeId]) return;
+    // Check each indexed query to see if we need to add this entity to the list
+    for (const query of this._archetypeQueryMap[Archetype._typeId]) {
+      query.addEntity(entity);
+      entity.queries.push(query);
     }
   }
 
@@ -38,6 +46,8 @@ export default class QueryManager {
         ~query.entities.indexOf(entity)
       ) {
         query.removeEntity(entity);
+        const index = entity.queries.indexOf(this);
+        entity.queries.splice(index, 1);
         continue;
       }
 
@@ -53,6 +63,7 @@ export default class QueryManager {
         continue;
 
       query.addEntity(entity);
+      entity.queries.push(query);
     }
   }
 
@@ -71,6 +82,7 @@ export default class QueryManager {
         query.match(entity)
       ) {
         query.addEntity(entity);
+        entity.queries.push(query);
         continue;
       }
 
@@ -80,6 +92,8 @@ export default class QueryManager {
         !query.match(entity)
       ) {
         query.removeEntity(entity);
+        const index = entity.queries.indexOf(this);
+        entity.queries.splice(index, 1);
         continue;
       }
     }
@@ -93,7 +107,18 @@ export default class QueryManager {
     var key = queryKey(Components);
     var query = this._queries[key];
     if (!query) {
-      this._queries[key] = query = new Query(Components, this._world);
+      this._queries[key] = query = new Query(Components, this._world.entityManager);
+
+      const Archetypes = this._world.archetypesManager.Archetypes.filter((a) =>
+        query.matchArchetype(a)
+      );
+
+      Archetypes.forEach((a) => {
+        if (!this._archetypeQueryMap[a._typeId]) {
+          this._archetypeQueryMap[a._typeId] = [];
+        }
+        this._archetypeQueryMap[a._typeId].push(query);
+      });
 
       Components.forEach((c) => {
         let component = typeof c === "object" ? c.Component : c;

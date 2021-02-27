@@ -1,5 +1,5 @@
 import test from "ava";
-import { World, Component, Types } from "../../src/index.js";
+import { World, Component, Types, Archetype } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
 /**
@@ -316,4 +316,35 @@ test("Delete entity from entitiesByNames", async (t) => {
   world.execute(); // Deferred remove happens
 
   t.deepEqual({}, world.entityManager._entitiesByNames);
+});
+
+test("Adding archetype", async (t) => {
+  const world = new World();
+
+  world.registerComponent(FooComponent);
+
+  class ArchetypeA extends Archetype {}
+  ArchetypeA.schema = {
+    foo: FooComponent,
+  };
+
+  world.registerArchetype(ArchetypeA);
+
+  const entity = world.createEntity().addArchetype(ArchetypeA, {
+    foo: {
+      variableFoo: 1,
+    },
+  });
+
+  t.true(entity.hasComponent(FooComponent));
+  t.is(entity.getComponent(FooComponent).variableFoo, 1);
+
+  const error = t.throws(() => {
+    entity.removeComponent(FooComponent);
+  });
+
+  t.is(
+    error.message,
+    "Component in archetype can\'t be removed independantly"
+  );
 });

@@ -23,6 +23,7 @@ export class Component {
     }
 
     this._pool = null;
+    this._isArchetype = false;
   }
 
   copy(source) {
@@ -61,6 +62,7 @@ export class Component {
         this[key] = type.copy(type.default, this[key]);
       }
     }
+    this._isArchetype = false;
   }
 
   dispose() {

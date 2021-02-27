@@ -1,6 +1,7 @@
 import { SystemManager } from "./SystemManager.js";
 import { EntityManager } from "./EntityManager.js";
 import { ComponentManager } from "./ComponentManager.js";
+import { ArchetypeManager } from "./ArchetypeManager.js";
 import { Version } from "./Version.js";
 import { hasWindow, now } from "./Utils.js";
 import { Entity } from "./Entity.js";
@@ -15,6 +16,7 @@ export class World {
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
     this.componentsManager = new ComponentManager(this);
+    this.archetypesManager = new ArchetypeManager(this);
     this.entityManager = new EntityManager(this);
     this.systemManager = new SystemManager(this);
 
@@ -37,6 +39,11 @@ export class World {
     return this;
   }
 
+  registerArchetype(Archetype) {
+    this.archetypesManager.registerArchetype(Archetype);
+    return this;
+  }
+
   registerSystem(System, attributes) {
     this.systemManager.registerSystem(System, attributes);
     return this;
@@ -44,6 +51,10 @@ export class World {
 
   hasRegisteredComponent(Component) {
     return this.componentsManager.hasComponent(Component);
+  }
+
+  hasRegisteredArchetype(Archetype) {
+    return this.archetypesManager.hasArchetype(Archetype);
   }
 
   unregisterSystem(System) {

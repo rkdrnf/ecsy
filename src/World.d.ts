@@ -2,6 +2,7 @@ import { Component, ComponentConstructor } from "./Component";
 import { System, SystemConstructor } from "./System";
 import { Entity } from "./Entity";
 import { ObjectPool } from "./ObjectPool";
+import { ArcheType, ArchetypeConstructor } from "./Archetype";
 
 export interface WorldOptions {
   entityPoolSize?: number;
@@ -22,6 +23,18 @@ export class World<EntityType extends Entity = Entity> {
    * Create a new World.
    */
   constructor(options?: WorldOptions);
+
+  /**
+   * Register an archetype.
+   * @param Archetype Type of archetype to register
+   */
+  registerArchetype<A extends Archetype>(Archetype: ArchetypeConstructor<A>): this;
+
+  /**
+   * Evluate whether an archetype has been registered to this world or not.
+   * @param Archetype Type of archetype to to evaluate
+   */
+  hasRegisteredArchetype<A extends Archetype>(Archetype: ArchetypeConstructor<A>): boolean;
 
   /**
    * Register a component.

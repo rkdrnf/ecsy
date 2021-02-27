@@ -8,6 +8,7 @@ export class Entity {
     // Unique ID for this entity
     this.id = entityManager._nextEntityId++;
 
+    this._Archetype = undefined;
     // Instance of the components
     this._components = {};
 
@@ -89,13 +90,20 @@ export class Entity {
   }
 
   removeComponent(Component, forceImmediate) {
+    const component = this._components[Component._typeId];
+    if (!component) return;
+
+    if (component._isArchetype) {
+      throw new Error(`Component in archetype can't be removed independantly`);
+    }
+
     this._entityManager.entityRemoveComponent(this, Component, forceImmediate);
     return this;
   }
 
   hasComponent(Component, includeRemoved) {
     return (
-      !!(this._components[Component._typeId]) ||
+      !!this._components[Component._typeId] ||
       (includeRemoved === true && this.hasRemovedComponent(Component))
     );
   }
@@ -105,15 +113,20 @@ export class Entity {
   }
 
   hasAllComponents(Components) {
-    return Components.every(c => this._components[c._typeId]);
+    return Components.every((c) => this._components[c._typeId]);
   }
 
   hasAnyComponents(Components) {
-    return Components.some(c => this._components[c._typeId]);
+    return Components.some((c) => this._components[c._typeId]);
   }
 
   removeAllComponents(forceImmediate) {
     return this._entityManager.entityRemoveAllComponents(this, forceImmediate);
+  }
+
+  addArchetype(Archetype, values) {
+    this._entityManager.entityAddArchetype(this, Archetype, values);
+    return this;
   }
 
   copy(src) {

@@ -38,7 +38,7 @@ export class EntityManager {
 
     this._entitiesByNames = {};
 
-    this._queryManager = new QueryManager(this);
+    this._queryManager = new QueryManager(world);
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new EntityPool(
       this,
@@ -76,6 +76,37 @@ export class EntityManager {
     return entity;
   }
 
+  entityAddArchetype(entity, Archetype, values) {
+    // @todo Probably define Component._typeId with a default value and avoid using typeof
+    if (
+      Archetype._typeId === undefined &&
+      !this.world.archetypesManager._ArchetypesMap[Archetype._typeId]
+    ) {
+      throw new Error(
+        `Attempted to add unregistered Archetype "${Archetype.getName()}"`
+      );
+    }
+
+    if (entity.Archetype) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "Entity already has a archetype. Only 1 archetype can be added per entity.",
+          entity,
+          Archetype.getName()
+        );
+      }
+      return;
+    }
+
+    entity._Archetype = Archetype;
+
+    Archetype._ComponentKeys.forEach(key => {
+      this.entityAddComponent(entity, Archetype.schema[key], values[key], true);
+    })
+    
+    this._queryManager.onEntityArchetypeAdded(entity, Archetype);
+  }
+
   // COMPONENTS
 
   /**
@@ -84,7 +115,7 @@ export class EntityManager {
    * @param {Component} Component Component to be added to the entity
    * @param {Object} values Optional values to replace the default attributes
    */
-  entityAddComponent(entity, Component, values) {
+  entityAddComponent(entity, Component, values, isArchetype = false) {
     // @todo Probably define Component._typeId with a default value and avoid using typeof
     if (
       typeof Component._typeId === "undefined" &&
@@ -122,9 +153,13 @@ export class EntityManager {
       component.copy(values);
     }
 
+    component._isArchetype = isArchetype;
+
     entity._components[Component._typeId] = component;
 
-    this._queryManager.onEntityComponentAdded(entity, Component);
+    if (!isArchetype) {
+      this._queryManager.onEntityComponentAdded(entity, Component);
+    }
     this.world.componentsManager.componentAddedToEntity(Component);
 
     this.eventDispatcher.dispatchEvent(COMPONENT_ADDED, entity, Component);
@@ -137,7 +172,8 @@ export class EntityManager {
    * @param {Bool} immediately If you want to remove the component immediately instead of deferred (Default is false)
    */
   entityRemoveComponent(entity, Component, immediately) {
-    if (!entity._components[Component._typeId]) return;
+    const component = entity._components[Component._typeId];
+    if (!component) return;
 
     this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
 
@@ -155,7 +191,9 @@ export class EntityManager {
     }
 
     // Check each indexed query to see if we need to remove it
-    this._queryManager.onEntityComponentRemoved(entity, Component);
+    if (!component._isArchetype) {
+      this._queryManager.onEntityComponentRemoved(entity, Component);
+    }
 
     if (Component.__proto__ === SystemStateComponent) {
       entity.numStateComponents--;

@@ -1,5 +1,5 @@
 import test from "ava";
-import { World, System, Not, Component } from "../../src/index.js";
+import { World, System, Not, Component, Archetype } from "../../src/index.js";
 import { FooComponent, BarComponent } from "../helpers/components";
 
 function queriesLength(queries) {
@@ -244,4 +244,135 @@ test("Two components with the same name get unique queries", (t) => {
 
   t.is(query1Entity.id, entity1.id);
   t.is(query2Entity.id, entity2.id);
+});
+
+test("Archetype queries", (t) => {
+  var world = new World();
+
+  world.registerComponent(FooComponent).registerComponent(BarComponent);
+
+  class ArchetypeA extends Archetype {}
+  ArchetypeA.schema = {
+    foo: FooComponent,
+  };
+
+  // System 1
+  class SystemTest extends System {
+    execute() {}
+  }
+
+  SystemTest.queries = {
+    foo: {
+      components: [FooComponent],
+      listen: {
+        added: true,
+        changed: true,
+        removed: true,
+      },
+    },
+    foobar: {
+      components: [FooComponent, BarComponent],
+      listen: {
+        added: true,
+        changed: true,
+        removed: true,
+      },
+    },
+  };
+
+  world.registerArchetype(ArchetypeA);
+  // Register empty system
+  world.registerSystem(SystemTest);
+
+  let system = world.systemManager.getSystem(SystemTest);
+
+  // Both queries starts empty
+  t.deepEqual(queriesLength(system.queries.foo), {
+    added: 0,
+    changed: 0,
+    removed: 0,
+    results: 0,
+  });
+
+  t.deepEqual(queriesLength(system.queries.foobar), {
+    added: 0,
+    changed: 0,
+    removed: 0,
+    results: 0,
+  });
+
+  //
+  let entity = world.createEntity().addArchetype(ArchetypeA, {
+    foo: {
+      variableFoo: 1,
+    },
+  });
+
+  t.deepEqual(queriesLength(system.queries.foo), {
+    added: 1,
+    changed: 0,
+    removed: 0,
+    results: 1,
+  });
+
+  t.deepEqual(queriesLength(system.queries.foobar), {
+    added: 0,
+    changed: 0,
+    removed: 0,
+    results: 0,
+  });
+
+  // clean up reactive queries
+  world.execute();
+
+  entity.addComponent(BarComponent);
+
+  t.deepEqual(queriesLength(system.queries.foo), {
+    added: 0,
+    changed: 0,
+    removed: 0,
+    results: 1,
+  });
+
+  t.deepEqual(queriesLength(system.queries.foobar), {
+    added: 1,
+    changed: 0,
+    removed: 0,
+    results: 1,
+  });
+
+  // clean up
+  world.execute();
+  entity.removeComponent(BarComponent);
+
+  t.deepEqual(queriesLength(system.queries.foo), {
+    added: 0,
+    changed: 0,
+    removed: 0,
+    results: 1,
+  });
+
+  t.deepEqual(queriesLength(system.queries.foobar), {
+    added: 0,
+    changed: 0,
+    removed: 1,
+    results: 0,
+  });
+
+  world.execute();
+  entity.remove();
+
+  t.deepEqual(queriesLength(system.queries.foo), {
+    added: 0,
+    changed: 0,
+    removed: 1,
+    results: 0,
+  });
+
+  t.deepEqual(queriesLength(system.queries.foobar), {
+    added: 0,
+    changed: 0,
+    removed: 0,
+    results: 0,
+  });
 });

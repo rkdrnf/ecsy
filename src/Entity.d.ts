@@ -1,4 +1,5 @@
 import { Component, ComponentConstructor } from "./Component";
+import { Archetype, ArchetypeConstructor } from "./Archetype";
 
 /**
  * An entity in the world.
@@ -28,7 +29,7 @@ export class Entity {
    * Get a component that is slated to be removed from this entity.
    */
   getRemovedComponent<C extends Component<any>>(
-      Component: ComponentConstructor<C>
+    Component: ComponentConstructor<C>
   ): Readonly<C> | undefined;
 
   /**
@@ -96,37 +97,39 @@ export class Entity {
    * Check if the entity has all components in a list.
    * @param Components Component types to check
    */
-  hasAllComponents(
-    Components: Array<ComponentConstructor<any>>
-  ): boolean
+  hasAllComponents(Components: Array<ComponentConstructor<any>>): boolean;
 
   /**
    * Check if the entity has any of the components in a list.
    * @param Components Component types to check
    */
-  hasAnyComponents(
-    Components: Array<ComponentConstructor<any>>
-  ): boolean
+  hasAnyComponents(Components: Array<ComponentConstructor<any>>): boolean;
 
   /**
    * Remove all components on this entity.
    * @param forceImmediate Whether all components should be removed immediately
    */
-  removeAllComponents(
-      forceImmediate?: boolean
-  ): void
+  removeAllComponents(forceImmediate?: boolean): void;
 
-  copy(source: this): this
+  /**
+   * Add an archetype to the entity.
+   * @param Archetype Type of archetype to add to this entity
+   * @param values Optional values to replace the default attributes on the component
+   */
+  addArchetype<A extends Archetype>(
+    Archetype: ArchetypeConstructor,
+    values?: { [key in A]: Partial<A[key]> }
+  ): this;
 
-  clone(): this
+  copy(source: this): this;
 
-  reset(): void
+  clone(): this;
+
+  reset(): void;
 
   /**
    * Remove this entity from the world.
    * @param forceImmediate Whether this entity should be removed immediately
    */
-  remove(
-      forceImmediate?: boolean
-  ): void;
+  remove(forceImmediate?: boolean): void;
 }

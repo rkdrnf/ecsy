@@ -10,6 +10,7 @@ export default class Query {
     this.NotComponentsMask = {};
     this.Components = [];
     this.NotComponents = [];
+    this.ArchetypesMask = {};
 
     Components.forEach((component) => {
       if (typeof component === "object") {
@@ -50,7 +51,6 @@ export default class Query {
    * @param {Entity} entity
    */
   addEntity(entity) {
-    entity.queries.push(this);
     this.entities.push(entity);
 
     this.eventDispatcher.dispatchEvent(Query.prototype.ENTITY_ADDED, entity);
@@ -65,9 +65,6 @@ export default class Query {
     if (~index) {
       this.entities.splice(index, 1);
 
-      index = entity.queries.indexOf(this);
-      entity.queries.splice(index, 1);
-
       this.eventDispatcher.dispatchEvent(
         Query.prototype.ENTITY_REMOVED,
         entity
@@ -79,6 +76,13 @@ export default class Query {
     return (
       this.Components.every((c) => entity._components[c._typeId]) &&
       !this.NotComponents.some((c) => entity._components[c._typeId])
+    );
+  }
+
+  matchArchetype(Archetype) {
+    return (
+      this.Components.every((c) => Archetype._Components[c._typeId]) &&
+      !this.NotComponents.some((c) => Archetype._Components[c._typeId])
     );
   }
 
