@@ -106,8 +106,6 @@ export class EntityManager {
       return;
     }
 
-    entity._ComponentTypes.push(Component);
-
     if (Component.__proto__ === SystemStateComponent) {
       entity.numStateComponents++;
     }
@@ -139,18 +137,16 @@ export class EntityManager {
    * @param {Bool} immediately If you want to remove the component immediately instead of deferred (Default is false)
    */
   entityRemoveComponent(entity, Component, immediately) {
-    var index = entity._ComponentTypes.indexOf(Component);
-    if (!~index) return;
+    if (!entity._components[Component._typeId]) return;
 
     this.eventDispatcher.dispatchEvent(COMPONENT_REMOVE, entity, Component);
 
     if (immediately) {
-      this._entityRemoveComponentSync(entity, Component, index);
+      this._entityRemoveComponentSync(entity, Component);
     } else {
       if (entity._ComponentTypesToRemove.length === 0)
         this.entitiesWithComponentsToRemove.push(entity);
 
-      entity._ComponentTypes.splice(index, 1);
       entity._ComponentTypesToRemove.push(Component);
 
       entity._componentsToRemove[Component._typeId] =
@@ -171,9 +167,8 @@ export class EntityManager {
     }
   }
 
-  _entityRemoveComponentSync(entity, Component, index) {
+  _entityRemoveComponentSync(entity, Component) {
     // Remove T listing on entity and property ref, then free the component.
-    entity._ComponentTypes.splice(index, 1);
     var component = entity._components[Component._typeId];
     delete entity._components[Component._typeId];
     component.dispose();
@@ -185,11 +180,10 @@ export class EntityManager {
    * @param {Entity} entity Entity from which the components will be removed
    */
   entityRemoveAllComponents(entity, immediately) {
-    let Components = entity._ComponentTypes;
-
-    for (let j = Components.length - 1; j >= 0; j--) {
-      if (Components[j].__proto__ !== SystemStateComponent)
-        this.entityRemoveComponent(entity, Components[j], immediately);
+    for (const typeId of Object.keys(entity._components)) {
+      const Component = this.componentsManager._ComponentsMap[typeId];
+      if (Component.__proto__ !== SystemStateComponent)
+        this.entityRemoveComponent(entity, Component, immediately);
     }
   }
 

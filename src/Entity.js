@@ -8,9 +8,6 @@ export class Entity {
     // Unique ID for this entity
     this.id = entityManager._nextEntityId++;
 
-    // List of components types the entity has
-    this._ComponentTypes = [];
-
     // Instance of the components
     this._components = {};
 
@@ -59,7 +56,7 @@ export class Entity {
   }
 
   getComponentTypes() {
-    return this._ComponentTypes;
+    return Object.values(this._components);
   }
 
   getMutableComponent(Component) {
@@ -137,7 +134,6 @@ export class Entity {
 
   reset() {
     this.id = this._entityManager._nextEntityId++;
-    this._ComponentTypes.length = 0;
     this.queries.length = 0;
 
     for (var ecsyComponentId in this._components) {
