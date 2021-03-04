@@ -2,7 +2,7 @@ import { Component, ComponentConstructor } from "./Component";
 import { System, SystemConstructor } from "./System";
 import { Entity } from "./Entity";
 import { ObjectPool } from "./ObjectPool";
-import { ArcheType, ArchetypeConstructor } from "./Archetype";
+import { Archetype, ArchetypeConstructor } from "./Archetype";
 
 export interface WorldOptions {
   entityPoolSize?: number;
