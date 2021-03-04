@@ -130,7 +130,7 @@ export class EntityManager {
       if (process.env.NODE_ENV !== "production") {
         console.warn(
           "Component type already exists on entity.",
-          entity,
+          entity._components.map(c => c.getName()),
           Component.getName()
         );
       }
