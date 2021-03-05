@@ -46,7 +46,7 @@ export default class QueryManager {
         ~query.entities.indexOf(entity)
       ) {
         query.removeEntity(entity);
-        const index = entity.queries.indexOf(this);
+        const index = entity.queries.indexOf(query);
         entity.queries.splice(index, 1);
         continue;
       }
@@ -92,7 +92,7 @@ export default class QueryManager {
         !query.match(entity)
       ) {
         query.removeEntity(entity);
-        const index = entity.queries.indexOf(this);
+        const index = entity.queries.indexOf(query);
         entity.queries.splice(index, 1);
         continue;
       }
