@@ -47,6 +47,9 @@ export default class QueryManager {
       ) {
         query.removeEntity(entity);
         const index = entity.queries.indexOf(query);
+        if (index === -1) {
+          throw new Error(`Tried to remove non-existing query from entity!`);
+        }
         entity.queries.splice(index, 1);
         continue;
       }
@@ -93,6 +96,9 @@ export default class QueryManager {
       ) {
         query.removeEntity(entity);
         const index = entity.queries.indexOf(query);
+        if (index === -1) {
+          throw new Error(`Tried to remove non-existing query from entity!`);
+        }
         entity.queries.splice(index, 1);
         continue;
       }
