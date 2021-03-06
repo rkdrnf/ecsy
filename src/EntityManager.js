@@ -100,10 +100,10 @@ export class EntityManager {
 
     entity._Archetype = Archetype;
 
-    Archetype._ComponentKeys.forEach(key => {
+    Archetype._ComponentKeys.forEach((key) => {
       this.entityAddComponent(entity, Archetype.schema[key], values[key], true);
-    })
-    
+    });
+
     this._queryManager.onEntityArchetypeAdded(entity, Archetype);
   }
 
@@ -185,6 +185,11 @@ export class EntityManager {
 
       entity._ComponentTypesToRemove.push(Component);
 
+      if (entity._componentsToRemove[Component._typeId]) {
+        throw new Error(
+          `RemoveComponent happened multiple times for a component ${Component.getName()}`
+        );
+      }
       entity._componentsToRemove[Component._typeId] =
         entity._components[Component._typeId];
       delete entity._components[Component._typeId];

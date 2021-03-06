@@ -363,3 +363,24 @@ test("Adding archetype default value", async (t) => {
   t.true(entity.hasComponent(FooComponent));
   t.is(entity.getComponent(FooComponent).variableFoo, 0);
 });
+
+test("Add and remove multiple times in single execution", async (t) => {
+  const world = new World();
+
+  world.registerComponent(FooComponent);
+
+  const entity = world
+    .createEntity()
+    .addComponent(FooComponent)
+    .removeComponent(FooComponent)
+    .addComponent(FooComponent);
+
+  const error = t.throws(() => {
+    entity.removeComponent(FooComponent);
+  });
+
+  t.is(
+    error.message,
+    "RemoveComponent happened multiple times for a component FooComponent"
+  );
+});
