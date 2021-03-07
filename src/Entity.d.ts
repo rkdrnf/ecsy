@@ -1,5 +1,5 @@
 import { Component, ComponentConstructor } from "./Component";
-import { Archetype, ArchetypeConstructor } from "./Archetype";
+import { Archetype, ArchetypeConstructor, ArchetypeProps } from "./Archetype";
 
 /**
  * An entity in the world.
@@ -118,9 +118,7 @@ export class Entity {
    */
   addArchetype<A extends Archetype>(
     Archetype: ArchetypeConstructor<A>,
-    values?: Partial<
-      { [key in keyof A]: Partial<Omit<A[key], keyof Component<any>>> }
-    >
+    values?: ArchetypeProps<A>
   ): this;
 
   copy(source: this): this;
