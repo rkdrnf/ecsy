@@ -1,10 +1,10 @@
-import { TagComponent } from "../../src/index";
+import { Archetype, TagComponent } from "../../src/index";
 import { Component } from "../../src/Component";
 import {
   Types,
   createType,
   copyCopyable,
-  cloneClonable
+  cloneClonable,
 } from "../../src/Types";
 
 export class Vector3 {
@@ -33,7 +33,7 @@ const Vector3Type = createType({
   name: "Vector3",
   default: new Vector3(),
   copy: copyCopyable,
-  clone: cloneClonable
+  clone: cloneClonable,
 });
 
 export class TagComponentA extends TagComponent {}
@@ -60,7 +60,7 @@ export class Component1 extends Component {
   }
 }
 Component1.schema = {
-  attr: { type: Types.Number }
+  attr: { type: Types.Number },
 };
 
 export class Component2 extends Component {
@@ -87,7 +87,7 @@ export class Component2 extends Component {
 }
 Component2.schema = {
   attr: { type: Types.Number },
-  attr2: { type: Types.Number }
+  attr2: { type: Types.Number },
 };
 
 export class Component3 extends Component {
@@ -118,7 +118,7 @@ export class Component3 extends Component {
 Component3.schema = {
   attr: { type: Types.Number },
   attr2: { type: Types.Number },
-  attr3: { type: Vector3Type }
+  attr3: { type: Vector3Type },
 };
 /*
 export class Component3NoReset extends Component {
@@ -145,4 +145,37 @@ export class NoCopyComponent extends Component {
   }
 }
 */
+
+export class Component4 extends Component {}
+Component4.schema = {
+  attr: { type: Types.Number },
+  attr2: { type: Types.Number },
+  attr3: { type: Vector3Type },
+};
+
+export class Component5 extends Component {}
+Component5.schema = {
+  attr: { type: Types.Number },
+  attr2: { type: Types.Number },
+  attr3: { type: Vector3Type },
+};
+
+export class Component6 extends Component {}
+Component6.schema = {
+  attr: { type: Types.Number },
+  attr2: { type: Types.Number },
+  attr3: { type: Vector3Type },
+};
+
 export class EmptyComponent extends Component {}
+
+export class TestArchetype extends Archetype {}
+
+TestArchetype.schema = {
+  comp1: Component1,
+  comp2: Component2,
+  comp3: Component3,
+  comp4: Component4,
+  comp5: Component5,
+  comp6: Component6,
+};

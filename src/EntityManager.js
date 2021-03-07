@@ -101,7 +101,12 @@ export class EntityManager {
     entity._Archetype = Archetype;
 
     Archetype._ComponentKeys.forEach((key) => {
-      this.entityAddComponent(entity, Archetype.schema[key], values[key], true);
+      this.entityAddComponent(
+        entity,
+        Archetype.schema[key],
+        values && values[key],
+        true
+      );
     });
 
     this._queryManager.onEntityArchetypeAdded(entity, Archetype);

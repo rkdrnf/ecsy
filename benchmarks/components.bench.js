@@ -6,105 +6,100 @@ export function init(benchmarks) {
     .group("components")
     .add({
       name: "Entity::addComponent(Component3)",
-      prepare: ctx => {
+      prepare: (ctx) => {
         ctx.world = new World();
         ctx.world.registerComponent(Component3);
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity();
         }
       },
-      execute: ctx => {
+      execute: (ctx) => {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].addComponent(Component3);
         }
-      }
+      },
     })
     .add({
       name: "Entity::addComponent(Component3)",
-      prepare: ctx => {
+      prepare: (ctx) => {
         ctx.world = new World();
         ctx.world.registerComponent(Component3);
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity();
         }
       },
-      execute: ctx => {
+      execute: (ctx) => {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].addComponent(Component3);
         }
-      }
+      },
     })
     .add({
       name: "Entity::removeComponent(Component3)",
-      prepare: ctx => {
+      prepare: (ctx) => {
         ctx.world = new World();
         ctx.world.registerComponent(Component3);
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity().addComponent(Component3);
         }
       },
-      execute: ctx => {
+      execute: (ctx) => {
         for (let i = 0; i < 100000; i++) {
-          ctx.world.entityManager._entities[i].removeComponent(
-            Component3
-          );
+          ctx.world.entityManager._entities[i].removeComponent(Component3);
         }
-      }
+      },
     })
     .add({
       name: "Entity::removeComponent(Component3)",
-      prepare: ctx => {
+      prepare: (ctx) => {
         ctx.world = new World();
         ctx.world.registerComponent(Component3);
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity().addComponent(Component3);
         }
       },
-      execute: ctx => {
+      execute: (ctx) => {
         for (let i = 0; i < 100000; i++) {
-          ctx.world.entityManager._entities[i].removeComponent(
-            Component3
-          );
+          ctx.world.entityManager._entities[i].removeComponent(Component3);
         }
-      }
+      },
     })
     .add({
       name: "Entity::removeComponent(Component3) sync",
-      prepare: ctx => {
+      prepare: (ctx) => {
         ctx.world = new World();
         ctx.world.registerComponent(Component3);
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity().addComponent(Component3);
         }
       },
-      execute: ctx => {
+      execute: (ctx) => {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].removeComponent(
             Component3,
             true
           );
         }
-      }
+      },
     })
     .add({
       name: "Entity::removeComponent(Component3) sync",
-      prepare: ctx => {
+      prepare: (ctx) => {
         ctx.world = new World();
         ctx.world.registerComponent(Component3);
         for (let i = 0; i < 100000; i++) {
           ctx.world.createEntity().addComponent(Component3);
         }
       },
-      execute: ctx => {
+      execute: (ctx) => {
         for (let i = 0; i < 100000; i++) {
           ctx.world.entityManager._entities[i].removeComponent(
             Component3,
             true
           );
         }
-      }
+      },
     });
-
   /*
     .add({
       name: "Entity::addComponent(Component3) poolsize = entities",
