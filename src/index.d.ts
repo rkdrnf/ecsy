@@ -7,4 +7,5 @@ export * from "./Archetype";
 export * from "./TagComponent";
 export * from "./SystemStateComponent";
 export * from "./Types";
+export * from "./ObjectPool";
 export as namespace ecsy;
